@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script>
+            var friends = [];
+            // var id = 0; //fix me
+
+            $(document).ready(function () {
+                loadFriendsArray();
+                friendsToDisplay();
+                disableButton();
+
+                $("input[name=ageSlider]").on('mousemove change', function () {
+                    var age = $(this).val();
+                    $("#ageDisplay").text(age);
+                });
+
+                $("input[name=nameInput]").blur(function () {
+                    var name = $(this).val();
+                    if (name.length < 1 || name.length > 20) {
+                        $("#nameError").show(); //.css("visibility", "hidden");
+                    } else {
+                        $("#nameError").hide(); //.css("visibility", "visible");
+                    }
+                });
+
+                $("#addButton").click(function () {
+                    var id = friends.length; /// fix me!!!
+                    id++;
+                    var name = $("input[name=nameInput]").val();
+                    if (name.length < 1 || name.length > 20) {
+                        $("#nameError").show();
+                        return;
+                    }
+                    $("#nameError").hide();
+
+                    var age = $("input[name=ageSlider]").val();
+                    var friend = {id: id, name: name, age: age};
+                    friends.push(friend);
+                    saveFriendsArray();
+                    friendsToDisplay();
+                    $("input[name=name]").val('');
+                    $("input[name=name]").val('30');
+
+                });
+
+                function saveFriendsArray() {
+                    var arrayAsStr = JSON.stringify(friends);
+                    localStorage.setItem('friendsArray', arrayAsStr);
+                }
+
+                function loadFriendsArray() {
+                    var data = localStorage.getItem('friendsArray');
+                    friends = (data == null) ? [] : JSON.parse(data);
+                }
+
+                function friendsToDisplay() {
+                    var html = "";
+                    for (var i = 0; i < friends.length; i++) {
+                        html += "<option value=\"" + friends[i].id + "\">" + friends[i].id + ": " + friends[i].name + " is " + friends[i].age + " years old </option>"
+                    }
+                    $("#listFriends").html(html);
+                }
+
+
+                function disableButton() {
+                    if ($("#listFriends").find(":selected").val() == undefined) {
+                        $("#removeButton").attr("disabled", true);
+                    } else {
+                        $("#removeButton").attr("disabled", false);
+                    }
+                }
+
+                $("#removeButton").click(function () {
+                    var friendsToRemove = $("#listFriends").find(":selected").val();
+                    if (friendsToRemove.length == 0) {
+                        alert("please choose at least one friend to remove");
+                        return;
+                    }
+                    for (var i = 0; i < friends.length; i++) {
+                        var friend = friends[i];
+                        for (var j = 0; j < friendsToRemove.length; j++) {
+                            if (friend.id == friendsToRemove[j]) {
+                                friends.splice(i, 1);
+                                i--;
+                            }
+                        }
+                    }
+                    saveFriendsArray();
+                    friendsToDisplay();
+                    disableButton();
+                });
+
+                $("#idFilter").click(function () {
+                    friends.sort(function (f1, f2) {
+                        return f1.id - f2.id;
+                    });
+                    friendsToDisplay();
+                    $("#idFilter").css("borderStyle", "inset");
+                    $("#nameFilter").css("borderStyle", "outset");
+                    $("#ageFilter").css("borderStyle", "outset");
+                });
+
+                $("#nameFilter").click(function () {
+                    friends.sort(function (f1, f2) {
+                        if (f1.name == f2.name) {
+                            return 0;
+                        }
+                        return f1.name > f2.name ? 1 : -1;
+                    });
+                    friendsToDisplay();
+                    $("#idFilter").css("borderStyle", "outset");
+                    $("#nameFilter").css("borderStyle", "inset");
+                    $("#ageFilter").css("borderStyle", "outset");
+                });
+
+                $("#ageFilter").click(function () {
+                    friends.sort(function (f1, f2) {
+                        return f1.age - f2.age;
+                    });
+                    friendsToDisplay();
+                    $("#idFilter").css("borderStyle", "outset");
+                    $("#nameFilter").css("borderStyle", "outset");
+                    $("#ageFilter").css("borderStyle", "inset");
+                });
+            });
+        </script>
+
+    </head>
+
+    <body>
+        <div>
+            <p>Sort by:
+                <button id="idFilter" value="id">Id</button>
+                <button id="nameFilter" value="name">Name</button>
+                <button id="ageFilter" value="age">Age</button></p>
+            <select id="listFriends" size="5" multiple>
+            </select>
+            <form id="myForm">
+                <p id="nameError" hidden style="color: red;">Name must be between 1 and 20 characters long</p>
+                <p>Name:<input name="nameInput" type="text"></p>
+                <p>Age: <output id="ageDisplay"></output> years old
+                    <input name="ageSlider" type="range" min="0" max="150"
+                           value="30"></p>
+
+            </form>
+            <button id="addButton">Add Friend</button><br>
+            <button id="removeButton">Remove Selected</button>
+        </div>
+
+    </body>
+
+</html>

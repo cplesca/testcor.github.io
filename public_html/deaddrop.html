@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                $('#saveButton').click(function () {
+                    var key = $("input[name=key]").val();
+                    var value = $("textarea[name=value]").val();
+                    console.log("Key: " + key + ", value: " + value);
+                    if (key.length == 0) {
+                        alert("key must not be empty");
+                        return;
+                    }
+                    localStorage.setItem(key, value);
+                    $("input[name=key]").val('');
+                    $("textarea[name=value]").val('');
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div>
+            Location (key): <input type="text" name="key"><br>
+            Value: <textarea name="value"></textarea><br>
+            <button id="saveButton">Save</button>        
+        </div>
+    </body>
+</html>
+
